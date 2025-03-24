@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Lehrling Kontakte</title>
+  <style>
+    /* Grundlegendes Seitenlayout */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background-color: #fff; /* Weißer Hintergrund */
+      color: #333;
+    }
+
+    /* Überschrift */
+    h1 {
+      text-align: center;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      font-weight: 400;
+      color: #333; /* Dunkles Grau */
+    }
+
+    /* Container, damit alles mittig steht und eine maximale Breite hat */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Suchfeld */
+    .search-container {
+      text-align: center;
+      margin: 20px 0 40px;
+    }
+    .search-container input {
+      width: 300px;
+      max-width: 90%;
+      padding: 10px 14px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      outline: none;
+      transition: box-shadow 0.3s;
+    }
+    .search-container input:focus {
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      border-color: #999;
+    }
+
+    /* Tabellencontainer für Responsive */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    /* Tabelle (keine Kopfzeile, 4 Spalten) */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+    }
+    tbody tr {
+      border-bottom: 1px solid #eee;
+    }
+    td {
+      padding: 12px 16px;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    tr:hover {
+      background-color: #f9f9f9;
+      cursor: pointer;
+    }
+
+    /* Profilbild in der Tabelle */
+    .profile-img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    /* Modal Hintergrund */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+
+    /* Modal Inhalt */
+    .modal-content {
+      background-color: #fff;
+      margin: 5% auto;
+      padding: 20px;
+      width: 500px;
+      max-width: 95%;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    /* Schließen-Button (X) */
+    .close {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* Detailansicht im Modal */
+    .detail-field {
+      margin: 8px 0;
+    }
+    .detail-field label {
+      font-weight: 600;
+      color: #007BFF;
+    }
+    .detail-field span {
+      margin-left: 10px;
+    }
+
+    /* Buttons */
+    .edit-button, .save-button, .cancel-button {
+      margin-top: 20px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .edit-button:hover,
+    .save-button:hover,
+    .cancel-button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Formularfelder für den Editiermodus */
+    .modal-content input {
+      width: 100%;
+      padding: 6px;
+      margin-top: 4px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .modal-content {
+        width: 90%;
+      }
+      .search-container input {
+        width: 90%;
+      }
+      td {
+        display: block;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Lehrling Kontakte</h1>
+
+  <div class="container">
+    <!-- Suchfeld -->
+    <div class="search-container">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Suchen..."
+        oninput="filterTable()"
+      />
+    </div>
+
+    <div class="table-container">
+      <table>
+        <tbody id="tableBody">
+          <!-- Dynamische Zeilen -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal: Detailansicht & Bearbeitung -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+
+      <!-- Detailansicht -->
+      <div id="detailView">
+        <div class="detail-field" style="text-align:center;">
+          <img
+            id="detailProfilBild"
+            src=""
+            alt="Profilbild"
+            style="width:100px;height:100px;object-fit:cover;border-radius:50%;"
+          />
+        </div>
+        <div class="detail-field">
+          <label>Name:</label>
+          <span id="detailName"></span>
+        </div>
+        <div class="detail-field">
+          <label>Vorname:</label>
+          <span id="detailVorname"></span>
+        </div>
+        <div class="detail-field">
+          <label>Nachname:</label>
+          <span id="detailNachname"></span>
+        </div>
+        <div class="detail-field">
+          <label>E-Mail Privat:</label>
+          <span id="detailMailPrivat"></span>
+        </div>
+        <div class="detail-field">
+          <label>E-Mail Firma:</label>
+          <span id="detailMailFirma"></span>
+        </div>
+        <div class="detail-field">
+          <label>Telefon:</label>
+          <span id="detailTelefon"></span>
+        </div>
+        <div class="detail-field">
+          <label>Strasse:</label>
+          <span id="detailStrasse"></span>
+        </div>
+        <div class="detail-field">
+          <label>Stadt:</label>
+          <span id="detailStadt"></span>
+        </div>
+        <div class="detail-field">
+          <label>PLZ:</label>
+          <span id="detailPlz"></span>
+        </div>
+        <div class="detail-field">
+          <label>Kanton:</label>
+          <span id="detailKanton"></span>
+        </div>
+        <div class="detail-field">
+          <label>Geburtsdatum:</label>
+          <span id="detailGeburtsdatum"></span>
+        </div>
+
+        <button class="edit-button" onclick="switchToEditMode()">Bearbeiten</button>
+      </div>
+
+      <!-- Editiermodus -->
+      <div id="editView" style="display:none;">
+        <div class="detail-field" style="text-align:center;">
+          <img
+            id="editProfilBildPreview"
+            src=""
+            alt="Profilbild"
+            style="width:100px;height:100px;object-fit:cover;border-radius:50%;"
+          />
+        </div>
+        <div class="detail-field">
+          <label for="editProfilBild">Profilbild URL:</label>
+          <input type="text" id="editProfilBild" />
+        </div>
+        <div class="detail-field">
+          <label for="editVorname">Vorname:</label>
+          <input type="text" id="editVorname" />
+        </div>
+        <div class="detail-field">
+          <label for="editNachname">Nachname:</label>
+          <input type="text" id="editNachname" />
+        </div>
+        <div class="detail-field">
+          <label for="editMailPrivat">E-Mail Privat:</label>
+          <input type="text" id="editMailPrivat" />
+        </div>
+        <div class="detail-field">
+          <label for="editMailFirma">E-Mail Firma:</label>
+          <input type="text" id="editMailFirma" />
+        </div>
+        <div class="detail-field">
+          <label for="editTelefon">Telefon:</label>
+          <input type="text" id="editTelefon" />
+        </div>
+        <div class="detail-field">
+          <label for="editStrasse">Strasse:</label>
+          <input type="text" id="editStrasse" />
+        </div>
+        <div class="detail-field">
+          <label for="editStadt">Stadt:</label>
+          <input type="text" id="editStadt" />
+        </div>
+        <div class="detail-field">
+          <label for="editPlz">PLZ:</label>
+          <input type="text" id="editPlz" />
+        </div>
+        <div class="detail-field">
+          <label for="editKanton">Kanton:</label>
+          <input type="text" id="editKanton" />
+        </div>
+        <div class="detail-field">
+          <label for="editGeburtsdatum">Geburtsdatum:</label>
+          <input type="text" id="editGeburtsdatum" />
+        </div>
+
+        <button class="save-button" onclick="saveChanges()">Speichern</button>
+        <button class="cancel-button" onclick="switchToDetailView()">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Airtable-Konfiguration
+    const airtableApiKey = 'patpHKb3dn8bOnscO.07f23adbba635e29713219dafa0264ecaad9c83da1e5d2c7c9dab1318b01c79e';
+    const baseId = 'appo91rayl20qwyWe';          
+    const tableName = 'Lehrlinge';        
+
+    // Aktuelle Record-ID und Datensatz speichern
+    let currentRecordId = null;
+    let currentRecord = null;
+
+    // Daten abrufen und Tabelle füllen
+    fetch(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}?view=Grid%20view`, {
+      headers: { Authorization: `Bearer ${airtableApiKey}` }
+    })
+    .then(response => response.json())
+    .then(data => {
+      const tableBody = document.getElementById('tableBody');
+      data.records.forEach(record => {
+        const fields = record.fields;
+        const row = document.createElement('tr');
+
+        // Zeile: Profilbild, Name, private E-Mail, Telefon
+        row.innerHTML = `
+          <td>
+            <img
+              class="profile-img"
+              src="${fields.ProfilBild || ''}"
+              alt="Profilbild"
+            />
+          </td>
+          <td>${fields.Vorname || ''} ${fields.Nachname || ''}</td>
+          <td>${fields['E-Mail_Privat'] || ''}</td>
+          <td>${fields.Telefon || ''}</td>
+        `;
+
+        // Beim Klick: Detailansicht
+        row.addEventListener('click', () => openDetailModal(record));
+        tableBody.appendChild(row);
+      });
+    })
+    .catch(error => console.error('Fehler beim Abrufen der Daten:', error));
+
+    // Öffnet das Detail-Popup
+    function openDetailModal(record) {
+      currentRecordId = record.id;
+      currentRecord = record;
+      const fields = record.fields;
+
+      // Detailfelder füllen
+      document.getElementById('detailProfilBild').src = fields.ProfilBild || '';
+      document.getElementById('detailName').innerText = `${fields.Vorname || ''} ${fields.Nachname || ''}`;
+      document.getElementById('detailVorname').innerText = fields.Vorname || '';
+      document.getElementById('detailNachname').innerText = fields.Nachname || '';
+      document.getElementById('detailMailPrivat').innerText = fields['E-Mail_Privat'] || '';
+      document.getElementById('detailMailFirma').innerText = fields['E-Mail_Firma'] || '';
+      document.getElementById('detailTelefon').innerText = fields.Telefon || '';
+      document.getElementById('detailStrasse').innerText = fields.Strasse || '';
+      document.getElementById('detailStadt').innerText = fields.Stadt || '';
+      document.getElementById('detailPlz').innerText = fields.PLZ || '';
+      document.getElementById('detailKanton').innerText = fields.Kanton || '';
+      document.getElementById('detailGeburtsdatum').innerText = fields.Geburtsdatum || '';
+
+      // Umschalten auf Detailansicht
+      document.getElementById('detailView').style.display = 'block';
+      document.getElementById('editView').style.display = 'none';
+      document.getElementById('detailModal').style.display = 'block';
+    }
+
+    // Modal schließen
+    function closeModal() {
+      document.getElementById('detailModal').style.display = 'none';
+    }
+
+    // Wechselt in den Bearbeitungsmodus
+    function switchToEditMode() {
+      const fields = currentRecord.fields;
+
+      // Edit-Felder befüllen
+      document.getElementById('editProfilBild').value = fields.ProfilBild || '';
+      document.getElementById('editProfilBildPreview').src = fields.ProfilBild || '';
+      document.getElementById('editVorname').value = fields.Vorname || '';
+      document.getElementById('editNachname').value = fields.Nachname || '';
+      document.getElementById('editMailPrivat').value = fields['E-Mail_Privat'] || '';
+      document.getElementById('editMailFirma').value = fields['E-Mail_Firma'] || '';
+      document.getElementById('editTelefon').value = fields.Telefon || '';
+      document.getElementById('editStrasse').value = fields.Strasse || '';
+      document.getElementById('editStadt').value = fields.Stadt || '';
+      document.getElementById('editPlz').value = fields.PLZ || '';
+      document.getElementById('editKanton').value = fields.Kanton || '';
+      document.getElementById('editGeburtsdatum').value = fields.Geburtsdatum || '';
+
+      // Umschalten auf Edit-Ansicht
+      document.getElementById('detailView').style.display = 'none';
+      document.getElementById('editView').style.display = 'block';
+    }
+
+    // Zurück zur Detailansicht
+    function switchToDetailView() {
+      document.getElementById('editView').style.display = 'none';
+      document.getElementById('detailView').style.display = 'block';
+    }
+
+    // Änderungen speichern via PATCH an Airtable
+    function saveChanges() {
+      const updatedFields = {
+        ProfilBild: document.getElementById('editProfilBild').value,
+        Vorname: document.getElementById('editVorname').value,
+        Nachname: document.getElementById('editNachname').value,
+        'E-Mail_Privat': document.getElementById('editMailPrivat').value,
+        'E-Mail_Firma': document.getElementById('editMailFirma').value,
+        Telefon: document.getElementById('editTelefon').value,
+        Strasse: document.getElementById('editStrasse').value,
+        Stadt: document.getElementById('editStadt').value,
+        PLZ: document.getElementById('editPlz').value,
+        Kanton: document.getElementById('editKanton').value,
+        Geburtsdatum: document.getElementById('editGeburtsdatum').value
+      };
+
+      fetch(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}/${currentRecordId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${airtableApiKey}`
+        },
+        body: JSON.stringify({ fields: updatedFields })
+      })
+      .then(response => response.json())
+      .then(updatedRecord => {
+        console.log('Datensatz aktualisiert:', updatedRecord);
+        closeModal();
+        location.reload(); // Seite neu laden, damit die Änderungen sichtbar werden
+      })
+      .catch(error => console.error('Fehler beim Aktualisieren der Daten:', error));
+    }
+
+    // Suchfunktion: Filtert die Tabelle
+    function filterTable() {
+      const input = document.getElementById('searchInput');
+      const filter = input.value.toLowerCase();
+      const table = document.querySelector('table');
+      const tr = table.getElementsByTagName('tr');
+      for (let i = 0; i < tr.length; i++) {
+        let rowText = tr[i].innerText.toLowerCase();
+        tr[i].style.display = rowText.indexOf(filter) > -1 ? '' : 'none';
+      }
+    }
+  </script>
+</body>
+</html>
