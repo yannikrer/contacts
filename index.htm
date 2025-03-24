@@ -2,404 +2,384 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Lehrling Kontakte</title>
+  <title>Lehrling Kontakte - Modern Responsive UI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Grundlegendes Seitenlayout */
-    body {
+    /* Farbvariablen & Grundeinstellungen */
+    :root {
+      --primary: #009999;
+      --primary-dark: #006B69;
+      --accent: #00A6A6;
+      --bg: #F0F4F8;
+      --white: #FFF;
+      --text: #333;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --shadow: rgba(0, 0, 0, 0.15);
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
       margin: 0;
       padding: 0;
-      font-family: "Helvetica Neue", Arial, sans-serif;
-      background-color: #fff; /* Weißer Hintergrund */
-      color: #333;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
     }
 
-    /* Überschrift */
-    h1 {
+    /* Fixierter moderner Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      padding: 20px;
       text-align: center;
-      margin-top: 40px;
-      margin-bottom: 20px;
-      font-weight: 400;
-      color: #333; /* Dunkles Grau */
+      z-index: 100;
+      box-shadow: 0 4px 8px var(--shadow);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--white);
     }
 
-    /* Container, damit alles mittig steht und eine maximale Breite hat */
-    .container {
+    /* Hauptbereich (Abstand zum Header) */
+    main {
+      margin-top: 100px;
+      padding: 20px;
       max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
-    /* Suchfeld */
+    /* Suchleiste */
     .search-container {
       text-align: center;
-      margin: 20px 0 40px;
+      margin-bottom: 40px;
     }
     .search-container input {
-      width: 300px;
+      width: 350px;
       max-width: 90%;
-      padding: 10px 14px;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 30px;
+      box-shadow: 0 2px 8px var(--shadow);
       font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 20px;
       outline: none;
-      transition: box-shadow 0.3s;
+      transition: box-shadow 0.3s ease;
     }
     .search-container input:focus {
-      box-shadow: 0 0 5px rgba(0,0,0,0.2);
-      border-color: #999;
+      box-shadow: 0 4px 16px var(--shadow);
     }
 
-    /* Tabellencontainer für Responsive */
-    .table-container {
-      overflow-x: auto;
+    /* Kartenlayout (responsive Grid) */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
     }
-
-    /* Tabelle (keine Kopfzeile, 4 Spalten) */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: #fff;
-    }
-    tbody tr {
-      border-bottom: 1px solid #eee;
-    }
-    td {
-      padding: 12px 16px;
-      vertical-align: middle;
-      white-space: nowrap;
-    }
-    tr:hover {
-      background-color: #f9f9f9;
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
     }
-
-    /* Profilbild in der Tabelle */
-    .profile-img {
-      width: 40px;
-      height: 40px;
-      object-fit: cover;
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px var(--shadow);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .card-header img {
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
-      margin-right: 8px;
-      vertical-align: middle;
+      object-fit: cover;
+      margin-right: 16px;
+      border: 2px solid var(--primary);
+    }
+    .card-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: var(--primary-dark);
+    }
+    .card-body {
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+    .card-body p {
+      margin: 4px 0;
     }
 
-    /* Modal Hintergrund */
+    /* Modernes Modal */
     .modal {
       display: none;
       position: fixed;
-      z-index: 999;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.4);
-    }
-
-    /* Modal Inhalt */
-    .modal-content {
-      background-color: #fff;
-      margin: 5% auto;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
       padding: 20px;
-      width: 500px;
-      max-width: 95%;
-      border-radius: 8px;
-      position: relative;
     }
-
-    /* Schließen-Button (X) */
-    .close {
+    .modal-content {
+      background: var(--white);
+      border-radius: 16px;
+      max-width: 500px;
+      width: 100%;
+      padding: 30px;
+      position: relative;
+      box-shadow: 0 4px 16px var(--shadow);
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal .close {
       position: absolute;
-      right: 15px;
       top: 15px;
+      right: 15px;
+      font-size: 1.5rem;
+      color: var(--primary-dark);
       cursor: pointer;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #333;
     }
 
     /* Detailansicht im Modal */
-    .detail-field {
-      margin: 8px 0;
+    .modal-details {
+      margin-top: 20px;
     }
-    .detail-field label {
+    .modal-details .detail-row {
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 6px;
+    }
+    .modal-details .detail-row span:first-child {
       font-weight: 600;
-      color: #007BFF;
+      color: var(--primary);
     }
-    .detail-field span {
+    .modal-details .detail-row span:last-child {
+      flex: 1;
+      text-align: right;
       margin-left: 10px;
     }
-
-    /* Buttons */
-    .edit-button, .save-button, .cancel-button {
+    .modal-buttons {
       margin-top: 20px;
-      background-color: #007BFF;
-      color: #fff;
+      text-align: center;
+    }
+    .modal-buttons button {
+      background: var(--primary);
+      color: var(--white);
       border: none;
-      padding: 10px 16px;
-      border-radius: 4px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
       cursor: pointer;
+      margin: 0 8px;
+      transition: background 0.3s ease;
     }
-    .edit-button:hover,
-    .save-button:hover,
-    .cancel-button:hover {
-      background-color: #0056b3;
+    .modal-buttons button:hover {
+      background: var(--primary-dark);
     }
-
-    /* Formularfelder für den Editiermodus */
-    .modal-content input {
+    
+    /* Editiermodus im Modal */
+    .modal-edit input {
       width: 100%;
-      padding: 6px;
-      margin-top: 4px;
-      margin-bottom: 10px;
-      box-sizing: border-box;
+      padding: 10px;
+      margin: 8px 0;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 6px;
+      font-size: 1rem;
     }
-
-    /* Responsive Design */
-    @media (max-width: 600px) {
+    
+    /* Zusätzliche responsive Anpassungen */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 1.75rem;
+      }
+      .card-header h2 {
+        font-size: 1.15rem;
+      }
       .modal-content {
-        width: 90%;
+        padding: 20px;
+      }
+    }
+    @media (max-width: 480px) {
+      header {
+        padding: 15px;
+      }
+      header h1 {
+        font-size: 1.5rem;
       }
       .search-container input {
         width: 90%;
+        padding: 12px 16px;
       }
-      td {
-        display: block;
-        width: 100%;
+      .card {
+        padding: 16px;
+      }
+      .modal-content {
+        padding: 15px;
       }
     }
   </style>
 </head>
 <body>
 
-  <h1>Lehrling Kontakte</h1>
+  <!-- Header -->
+  <header>
+    <h1>Lehrling Kontakte</h1>
+  </header>
 
-  <div class="container">
-    <!-- Suchfeld -->
+  <main>
     <div class="search-container">
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="Suchen..."
-        oninput="filterTable()"
-      />
+      <input type="text" id="searchInput" placeholder="Suche nach Namen, E-Mail oder Telefon..." oninput="filterCards()">
     </div>
-
-    <div class="table-container">
-      <table>
-        <tbody id="tableBody">
-          <!-- Dynamische Zeilen -->
-        </tbody>
-      </table>
+    <div class="card-grid" id="cardGrid">
+      <!-- Dynamische Karten werden hier eingefügt -->
     </div>
-  </div>
+  </main>
 
   <!-- Modal: Detailansicht & Bearbeitung -->
-  <div id="detailModal" class="modal">
+  <div class="modal" id="detailModal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
-
+      
       <!-- Detailansicht -->
       <div id="detailView">
-        <div class="detail-field" style="text-align:center;">
-          <img
-            id="detailProfilBild"
-            src=""
-            alt="Profilbild"
-            style="width:100px;height:100px;object-fit:cover;border-radius:50%;"
-          />
+        <div style="text-align: center;">
+          <img id="modalProfilBild" src="" alt="Profilbild" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border: 3px solid var(--primary);">
         </div>
-        <div class="detail-field">
-          <label>Name:</label>
-          <span id="detailName"></span>
+        <div class="modal-details" id="modalDetails">
+          <!-- Dynamische Detailzeilen (Vorname, Nachname, E-Mail, Telefon etc.) -->
         </div>
-        <div class="detail-field">
-          <label>Vorname:</label>
-          <span id="detailVorname"></span>
+        <div class="modal-buttons" id="modalButtons">
+          <button onclick="switchToEditMode()">Bearbeiten</button>
         </div>
-        <div class="detail-field">
-          <label>Nachname:</label>
-          <span id="detailNachname"></span>
-        </div>
-        <div class="detail-field">
-          <label>E-Mail Privat:</label>
-          <span id="detailMailPrivat"></span>
-        </div>
-        <div class="detail-field">
-          <label>E-Mail Firma:</label>
-          <span id="detailMailFirma"></span>
-        </div>
-        <div class="detail-field">
-          <label>Telefon:</label>
-          <span id="detailTelefon"></span>
-        </div>
-        <div class="detail-field">
-          <label>Strasse:</label>
-          <span id="detailStrasse"></span>
-        </div>
-        <div class="detail-field">
-          <label>Stadt:</label>
-          <span id="detailStadt"></span>
-        </div>
-        <div class="detail-field">
-          <label>PLZ:</label>
-          <span id="detailPlz"></span>
-        </div>
-        <div class="detail-field">
-          <label>Kanton:</label>
-          <span id="detailKanton"></span>
-        </div>
-        <div class="detail-field">
-          <label>Geburtsdatum:</label>
-          <span id="detailGeburtsdatum"></span>
-        </div>
-
-        <button class="edit-button" onclick="switchToEditMode()">Bearbeiten</button>
       </div>
-
-      <!-- Editiermodus -->
-      <div id="editView" style="display:none;">
-        <div class="detail-field" style="text-align:center;">
-          <img
-            id="editProfilBildPreview"
-            src=""
-            alt="Profilbild"
-            style="width:100px;height:100px;object-fit:cover;border-radius:50%;"
-          />
+      
+      <!-- Editiermodus (initial versteckt) -->
+      <div id="modalEdit" class="modal-edit" style="display:none;">
+        <div style="margin-bottom: 20px;">
+          <input type="text" id="editProfilBild" placeholder="Profilbild URL">
+          <input type="text" id="editVorname" placeholder="Vorname">
+          <input type="text" id="editNachname" placeholder="Nachname">
+          <input type="text" id="editMailPrivat" placeholder="E-Mail Privat">
+          <input type="text" id="editMailFirma" placeholder="E-Mail Firma">
+          <input type="text" id="editTelefon" placeholder="Telefon">
+          <input type="text" id="editStrasse" placeholder="Strasse">
+          <input type="text" id="editStadt" placeholder="Stadt">
+          <input type="text" id="editPlz" placeholder="PLZ">
+          <input type="text" id="editKanton" placeholder="Kanton">
+          <input type="text" id="editGeburtsdatum" placeholder="Geburtsdatum">
         </div>
-        <div class="detail-field">
-          <label for="editProfilBild">Profilbild URL:</label>
-          <input type="text" id="editProfilBild" />
+        <div class="modal-buttons">
+          <button onclick="saveChanges()">Speichern</button>
+          <button onclick="switchToDetailView()">Abbrechen</button>
         </div>
-        <div class="detail-field">
-          <label for="editVorname">Vorname:</label>
-          <input type="text" id="editVorname" />
-        </div>
-        <div class="detail-field">
-          <label for="editNachname">Nachname:</label>
-          <input type="text" id="editNachname" />
-        </div>
-        <div class="detail-field">
-          <label for="editMailPrivat">E-Mail Privat:</label>
-          <input type="text" id="editMailPrivat" />
-        </div>
-        <div class="detail-field">
-          <label for="editMailFirma">E-Mail Firma:</label>
-          <input type="text" id="editMailFirma" />
-        </div>
-        <div class="detail-field">
-          <label for="editTelefon">Telefon:</label>
-          <input type="text" id="editTelefon" />
-        </div>
-        <div class="detail-field">
-          <label for="editStrasse">Strasse:</label>
-          <input type="text" id="editStrasse" />
-        </div>
-        <div class="detail-field">
-          <label for="editStadt">Stadt:</label>
-          <input type="text" id="editStadt" />
-        </div>
-        <div class="detail-field">
-          <label for="editPlz">PLZ:</label>
-          <input type="text" id="editPlz" />
-        </div>
-        <div class="detail-field">
-          <label for="editKanton">Kanton:</label>
-          <input type="text" id="editKanton" />
-        </div>
-        <div class="detail-field">
-          <label for="editGeburtsdatum">Geburtsdatum:</label>
-          <input type="text" id="editGeburtsdatum" />
-        </div>
-
-        <button class="save-button" onclick="saveChanges()">Speichern</button>
-        <button class="cancel-button" onclick="switchToDetailView()">Abbrechen</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Airtable-Konfiguration
+    // Airtable-Konfiguration – bitte hier mit deinen Werten ersetzen!
     const airtableApiKey = 'patpHKb3dn8bOnscO.07f23adbba635e29713219dafa0264ecaad9c83da1e5d2c7c9dab1318b01c79e';
-    const baseId = 'appo91rayl20qwyWe';          
-    const tableName = 'Lehrlinge';        
+    const baseId = 'appo91rayl20qwyWe';
+    const tableName = 'Lehrlinge';
 
-    // Aktuelle Record-ID und Datensatz speichern
-    let currentRecordId = null;
     let currentRecord = null;
+    let currentRecordId = null;
 
-    // Daten abrufen und Tabelle füllen
+    // Daten abrufen und Karten erstellen
     fetch(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}?view=Grid%20view`, {
       headers: { Authorization: `Bearer ${airtableApiKey}` }
     })
     .then(response => response.json())
     .then(data => {
-      const tableBody = document.getElementById('tableBody');
+      const cardGrid = document.getElementById('cardGrid');
       data.records.forEach(record => {
         const fields = record.fields;
-        const row = document.createElement('tr');
-
-        // Zeile: Profilbild, Name, private E-Mail, Telefon
-        row.innerHTML = `
-          <td>
-            <img
-              class="profile-img"
-              src="${fields.ProfilBild || ''}"
-              alt="Profilbild"
-            />
-          </td>
-          <td>${fields.Vorname || ''} ${fields.Nachname || ''}</td>
-          <td>${fields['E-Mail_Privat'] || ''}</td>
-          <td>${fields.Telefon || ''}</td>
+        // Erstelle eine Karte mit Profilbild, Namen, E-Mail Privat und Telefon
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="card-header">
+            <img class="profile-img" src="${fields.ProfilBild || ''}" alt="Profilbild">
+            <h2>${fields.Vorname || ''} ${fields.Nachname || ''}</h2>
+          </div>
+          <div class="card-body">
+            <p><strong>E-Mail:</strong> ${fields['E-Mail_Privat'] || ''}</p>
+            <p><strong>Telefon:</strong> ${fields.Telefon || ''}</p>
+          </div>
         `;
-
-        // Beim Klick: Detailansicht
-        row.addEventListener('click', () => openDetailModal(record));
-        tableBody.appendChild(row);
+        card.addEventListener('click', () => openDetailModal(record));
+        cardGrid.appendChild(card);
       });
     })
     .catch(error => console.error('Fehler beim Abrufen der Daten:', error));
 
-    // Öffnet das Detail-Popup
+    // Öffnet das Modal und füllt die Detailansicht
     function openDetailModal(record) {
-      currentRecordId = record.id;
       currentRecord = record;
+      currentRecordId = record.id;
       const fields = record.fields;
-
-      // Detailfelder füllen
-      document.getElementById('detailProfilBild').src = fields.ProfilBild || '';
-      document.getElementById('detailName').innerText = `${fields.Vorname || ''} ${fields.Nachname || ''}`;
-      document.getElementById('detailVorname').innerText = fields.Vorname || '';
-      document.getElementById('detailNachname').innerText = fields.Nachname || '';
-      document.getElementById('detailMailPrivat').innerText = fields['E-Mail_Privat'] || '';
-      document.getElementById('detailMailFirma').innerText = fields['E-Mail_Firma'] || '';
-      document.getElementById('detailTelefon').innerText = fields.Telefon || '';
-      document.getElementById('detailStrasse').innerText = fields.Strasse || '';
-      document.getElementById('detailStadt').innerText = fields.Stadt || '';
-      document.getElementById('detailPlz').innerText = fields.PLZ || '';
-      document.getElementById('detailKanton').innerText = fields.Kanton || '';
-      document.getElementById('detailGeburtsdatum').innerText = fields.Geburtsdatum || '';
-
-      // Umschalten auf Detailansicht
+      
+      // Setze Bild (falls vorhanden)
+      const modalProfilBild = document.getElementById('modalProfilBild');
+      if(modalProfilBild) {
+        modalProfilBild.src = fields.ProfilBild || '';
+      }
+      
+      // Detailzeilen erzeugen
+      const details = [
+        { label: 'Vorname', value: fields.Vorname || '' },
+        { label: 'Nachname', value: fields.Nachname || '' },
+        { label: 'E-Mail Privat', value: fields['E-Mail_Privat'] || '' },
+        { label: 'E-Mail Firma', value: fields['E-Mail_Firma'] || '' },
+        { label: 'Telefon', value: fields.Telefon || '' },
+        { label: 'Strasse', value: fields.Strasse || '' },
+        { label: 'Stadt', value: fields.Stadt || '' },
+        { label: 'PLZ', value: fields.PLZ || '' },
+        { label: 'Kanton', value: fields.Kanton || '' },
+        { label: 'Geburtsdatum', value: fields.Geburtsdatum || '' }
+      ];
+      const modalDetails = document.getElementById('modalDetails');
+      if(modalDetails) {
+        modalDetails.innerHTML = '';
+        details.forEach(detail => {
+          const row = document.createElement('div');
+          row.className = 'detail-row';
+          row.innerHTML = `<span>${detail.label}:</span><span>${detail.value}</span>`;
+          modalDetails.appendChild(row);
+        });
+      }
+      
+      // Zeige Detailansicht, verstecke Editiermodus
       document.getElementById('detailView').style.display = 'block';
-      document.getElementById('editView').style.display = 'none';
-      document.getElementById('detailModal').style.display = 'block';
+      document.getElementById('modalEdit').style.display = 'none';
+      document.getElementById('detailModal').style.display = 'flex';
     }
-
-    // Modal schließen
+    
+    // Schließt das Modal
     function closeModal() {
       document.getElementById('detailModal').style.display = 'none';
     }
-
-    // Wechselt in den Bearbeitungsmodus
+    
+    // Wechsel in den Editiermodus
     function switchToEditMode() {
       const fields = currentRecord.fields;
-
-      // Edit-Felder befüllen
       document.getElementById('editProfilBild').value = fields.ProfilBild || '';
-      document.getElementById('editProfilBildPreview').src = fields.ProfilBild || '';
       document.getElementById('editVorname').value = fields.Vorname || '';
       document.getElementById('editNachname').value = fields.Nachname || '';
       document.getElementById('editMailPrivat').value = fields['E-Mail_Privat'] || '';
@@ -410,19 +390,19 @@
       document.getElementById('editPlz').value = fields.PLZ || '';
       document.getElementById('editKanton').value = fields.Kanton || '';
       document.getElementById('editGeburtsdatum').value = fields.Geburtsdatum || '';
-
-      // Umschalten auf Edit-Ansicht
+      
+      // Umschalten: Detailansicht ausblenden, Editiermodus anzeigen
       document.getElementById('detailView').style.display = 'none';
-      document.getElementById('editView').style.display = 'block';
+      document.getElementById('modalEdit').style.display = 'block';
     }
-
+    
     // Zurück zur Detailansicht
     function switchToDetailView() {
-      document.getElementById('editView').style.display = 'none';
+      document.getElementById('modalEdit').style.display = 'none';
       document.getElementById('detailView').style.display = 'block';
     }
-
-    // Änderungen speichern via PATCH an Airtable
+    
+    // Speichert Änderungen via PATCH an Airtable
     function saveChanges() {
       const updatedFields = {
         ProfilBild: document.getElementById('editProfilBild').value,
@@ -450,21 +430,18 @@
       .then(updatedRecord => {
         console.log('Datensatz aktualisiert:', updatedRecord);
         closeModal();
-        location.reload(); // Seite neu laden, damit die Änderungen sichtbar werden
+        location.reload();
       })
       .catch(error => console.error('Fehler beim Aktualisieren der Daten:', error));
     }
-
-    // Suchfunktion: Filtert die Tabelle
-    function filterTable() {
-      const input = document.getElementById('searchInput');
-      const filter = input.value.toLowerCase();
-      const table = document.querySelector('table');
-      const tr = table.getElementsByTagName('tr');
-      for (let i = 0; i < tr.length; i++) {
-        let rowText = tr[i].innerText.toLowerCase();
-        tr[i].style.display = rowText.indexOf(filter) > -1 ? '' : 'none';
-      }
+    
+    // Suchfunktion: Filtert die Karten anhand des eingegebenen Textes
+    function filterCards() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.getElementsByClassName('card');
+      Array.from(cards).forEach(card => {
+        card.style.display = card.innerText.toLowerCase().includes(input) ? 'block' : 'none';
+      });
     }
   </script>
 </body>
